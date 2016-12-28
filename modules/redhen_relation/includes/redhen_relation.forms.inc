@@ -58,16 +58,16 @@ function redhen_relation_connection_form($form, &$form_state, $entity, $relation
   $form_state['entity'] = $entity;
   $form_state['relation'] = $relation;
 
-  $form['fields'] = array(
+  $form['relation_settings'] = array(
     '#type' => 'fieldset',
     '#id' => 'redhen_relation_fields',
     '#title' => t('Connection'),
   );
   // Attach any fields.
-  field_attach_form('relation', $relation, $form['fields'], $form_state);
+  field_attach_form('relation', $relation, $form['relation_settings'], $form_state);
 
   // Wrapper used for the Org or Contact entity itself.
-  $form['entity_info'] = array(
+  $form['relation_settings']['entity_info'] = array(
     '#type' => 'fieldset',
     '#weight' => 9,
     '#prefix' => '<div id="related-entity">',
@@ -98,7 +98,6 @@ function redhen_relation_connection_form($form, &$form_state, $entity, $relation
           'message' => t('Retrieving fields for this connection type.'),
         ),
       ),
-      '#description' => t('Connections are only allowed between contacts and organizations.'),
       '#weight' => -99,
     );
 
@@ -118,11 +117,11 @@ function redhen_relation_connection_form($form, &$form_state, $entity, $relation
 
     $info = entity_get_info($entity_type_to_relate);
     $plural_label = isset($info['plural label']) ? $info['plural label'] : $info['label'] . 's';
-    $form['entity_info']['#title'] = $info['label'];
+    $form['relation_settings']['entity_info']['#title'] = $info['label'];
 
     $new = isset($form_state['values']['new_or_existing']) ? $form_state['values']['new_or_existing'] : 1;
 
-    $form['fields']['new_or_existing'] = array(
+    $form['relation_settings']['new_or_existing'] = array(
       '#title' => t('New or existing @type', array('@type' => drupal_strtolower($info['label']))),
       '#type' => 'select',
       '#options' => array(
@@ -139,7 +138,7 @@ function redhen_relation_connection_form($form, &$form_state, $entity, $relation
     );
 
     if ($new == 0) {
-      $form['entity_info']['entity_to_relate'] = array(
+      $form['relation_settings']['entity_info']['entity_to_relate'] = array(
         '#title' => $plural_label,
         '#type' => 'textfield',
         '#required' => ($active_relation_type->min_arity == 1) ? FALSE : TRUE,
@@ -150,7 +149,7 @@ function redhen_relation_connection_form($form, &$form_state, $entity, $relation
     }
   }
 
-  if ( ($new == 1) || ($edit) ) {
+  if (($new == 1) || ($edit)) {
     // Get entity callbacks and variables.
     $entity_types = array();
     switch ($entity_type_to_relate) {
@@ -175,22 +174,18 @@ function redhen_relation_connection_form($form, &$form_state, $entity, $relation
         $entity_type_options[$type_name] = $type->label;
       }
       $default_entity_type = key($entity_type_options);
-      $form['entity_info']['entity_type'] = array(
+      $form['relation_settings']['entity_info']['entity_type'] = array(
         '#type' => 'select',
         '#title' => t('Select @type type', array('@type' => drupal_strtolower($info['label']))),
         '#options' => $entity_type_options,
         '#default_value' => $default_entity_type,
         '#ajax' => array(
-          'callback' => 'redhen_relation_form_refresh',
+          'callback' => 'redhen_relation_form_related_entity_info_refresh',
           'wrapper' => 'entity-form',
         ),
         '#id' => 'entity-type',
       );
     }
-
-    $form['entity_info']['entity_form_wrapper'] = array(
-      '#type' => 'container',
-    );
 
     $entity_type = isset($form_state['input']['entity_type']) ? $form_state['input']['entity_type'] : $default_entity_type;
 
@@ -214,11 +209,11 @@ function redhen_relation_connection_form($form, &$form_state, $entity, $relation
 
     $entity_form['#prefix'] = '<div id="entity-form">';
     $entity_form['#suffix'] = '</div>';
-    $form['entity_info']['entity_form_wrapper']['form'] = $entity_form;
+    $form['relation_settings']['entity_info']['entity_form'] = $entity_form;
   }
 
   // Hide the endpoints field widget. @TODO: Find out why appearing.
-  $form['fields']['endpoints']['#access'] = FALSE;
+  $form['relation_settings']['endpoints']['#access'] = FALSE;
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -240,7 +235,19 @@ function redhen_relation_connection_form($form, &$form_state, $entity, $relation
  *   Form state array.
  */
 function redhen_relation_form_refresh(&$form, &$form_state) {
-  return $form['entity_info']['entity_form_wrapper']['form'];
+  return $form['relation_settings'];
+}
+
+/**
+ * AJAX refresh callback for new entity form.
+ *
+ * @param array $form
+ *   Form array.
+ * @param array $form_state
+ *   Form state array.
+ */
+function redhen_relation_form_related_entity_info_refresh(&$form, &$form_state) {
+  return $form['relation_settings']['entity_info']['entity_form'];
 }
 
 /**
@@ -252,7 +259,7 @@ function redhen_relation_form_refresh(&$form, &$form_state) {
  *   Form state array.
  */
 function redhen_relation_form_related_entity_refresh(&$form, &$form_state) {
-  return $form['entity_info'];
+  return $form['relation_settings']['entity_info'];
 }
 
 /**
