@@ -470,8 +470,16 @@ function redhen_fields_theme($existing, $type, $theme, $path) {
  */
 function redhen_fields_field_widget_info() {
   return array(
+    'redhen_email_simple_widget' => array(
+      'label' => t('Simple Email field'),
+      'field types' => array('redhen_email'),
+      'settings' => array(),
+      'behaviors' => array(
+        'default value' => FIELD_BEHAVIOR_NONE,
+      ),
+    ),
     'redhen_email_widget' => array(
-      'label' => t('Email field'),
+      'label' => t('Rich Email field'),
       'field types' => array('redhen_email'),
       'settings' => array(),
       'behaviors' => array(
@@ -497,6 +505,7 @@ function redhen_fields_field_widget_form(&$form, &$form_state, $field, $instance
         '#title' => t("@label", array('@label' => $instance['label'])),
         '#type' => 'textfield',
         '#default_value' => isset($items[$delta]['value']) ? $items[$delta]['value'] : NULL,
+        '#description' => isset($instance['description']) ? $instance['description'] : NULL,
         '#size' => 35,
         '#weight' => -1,
       );
@@ -542,13 +551,39 @@ function redhen_fields_field_widget_form(&$form, &$form_state, $field, $instance
         '#default_value' => isset($items[$delta]['default']) ? $items[$delta]['default'] : $delta == 0,
         '#weight' => 2,
       );
+
       break;
+
+    case "redhen_email_simple_widget":
+      $field_class = drupal_html_class($field['type']);
+      if ($field['cardinality'] == 1) {
+        $element_class = $field_class . '-single-value';
+        $element['#prefix'] = '<div class="'. $element_class . '">';
+        $element['#suffix'] = '</div>';
+      }
+      $element['value'] = array(
+        '#title' => t("@label", array('@label' => $instance['label'])),
+        '#type' => 'textfield',
+        '#description' => isset($instance['description']) ? $instance['description'] : NULL,
+        '#default_value' => isset($items[$delta]['value']) ? $items[$delta]['value'] : NULL,
+        '#size' => 35,
+      );
+      $element['default'] = array(
+        '#title' => t('Primary'),
+        '#type' => 'checkbox',
+        '#default_value' => TRUE,
+        '#access' => FALSE,
+      );
+      if (module_exists('redhen_contact')) {
+        $element['value']['#required'] = variable_get(REDHEN_CONTACT_REQUIRE_EMAIL, FALSE);
+      }
+      break;
+
   }
 
   $path = drupal_get_path('module', 'redhen_fields');
   $element['#attached']['js'] = array($path . '/redhen_fields.js');
   $element['#attached']['css'] = array($path . '/redhen_fields.css');
-
   return $element;
 }
 
@@ -855,7 +890,7 @@ function redhen_fields_create_email_field() {
     $email_field = array(
       'field_name' => REDHEN_CONTACT_EMAIL_FIELD,
       'type' => 'redhen_email',
-      'locked' => TRUE,
+      'locked' => FALSE,
       'cardinality' => FIELD_CARDINALITY_UNLIMITED,
       'settings' => array(
         'labels' => array(
