@@ -31,17 +31,7 @@ function redhen_registration_menu() {
 function redhen_registration_page(RedhenContact $contact) {
   $query = new EntityFieldQuery();
   $query->entityCondition('entity_type', 'registration');
-
-  $wrapper = entity_metadata_wrapper('redhen_contact', $contact);
-  $user = $wrapper->user->value();
-
-  if ($user) {
-    $query->propertyCondition('user_uid', $user->uid, '=');
-  }
-  else {
-    $query->propertyCondition('anon_mail', $contact->allEmail(), 'IN');
-  }
-
+  $query->propertyCondition('registrant_id', $contact->identifier(), '=');
   $result = $query->execute();
 
   // setup the header for both the query and table
@@ -54,12 +44,6 @@ function redhen_registration_page(RedhenContact $contact) {
     ),
     'entity' => array('data' => 'Parent Entity'),
     'author' => array('data' => 'Author'),
-    'email' => array(
-      'field' => 'mail',
-      'type' => 'property',
-      'data' => 'Email',
-      'specifier' => 'mail'
-    ),
     'count' => array(
       'field' => 'count',
       'type' => 'property',
@@ -134,7 +118,6 @@ function theme_redhen_registration_list($variables) {
           check_plain($reg_type->label),
           l(entity_label($registration->entity_type, $entity), $entity_uri['path']),
           $author ? $author->name : '',
-          l($registration->anon_mail, 'mailto:' . $registration->anon_mail),
           $registration->count,
           redhen_format_date($registration->updated, 'short'),
           implode(' | ', $actions)
