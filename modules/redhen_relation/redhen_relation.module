@@ -525,7 +525,7 @@ function redhen_relation_connections_page($entity) {
  *     3 => array($entity3, $entity4)
  *   )
  */
-function redhen_relation_relations($entity, $relation_types = NULL, $active = FALSE) {
+function redhen_relation_relations($entity, $relation_types = array(), $active = FALSE) {
   // Backwards compatibility:
   if ($relation_types && !is_array($relation_types)) {
     $relation_types = array($relation_types);
