@@ -222,6 +222,10 @@ function redhen_relation_permission() {
       'title' => t('Delete RedHen Contact Connections'),
       'description' => t('Delete connections for a contact.'),
     ),
+    'administer relation roles' => array(
+      'title' => t('Administer redhen relation roles'),
+      'description' => t('Administer redhen relation roles.'),
+    ),
   );
 }
 
