@@ -339,13 +339,32 @@ function redhen_help($path, $arg) {
   switch ($path) {
     case 'redhen':
     case 'admin/help#redhen':
-      return '<p>' . t(
-        '<a href="@redhen">RedHen CRM</a> is an open source CRM <em>framework</em> built natively in <a href="@drupal">Drupal</a>. RedHen CRM is packed with <a href="@wikipedia_ams">association management</a> (AMS) features for managing detailed information on contacts and organizations, membership services, event registrations, and constituent engagement.',
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t(
+        'The <a href="@redhen">RedHen CRM</a> module is an open source CRM <em>framework</em> built natively in <a href="@drupal">Drupal</a>. RedHen CRM is packed with <a href="@wikipedia_ams">association management</a> (AMS) features for managing detailed information on contacts and organizations, membership services, event registrations, and constituent engagement. For more information, see the online documentation for the <a href="@doco">RedHen module</a>.',
         array(
           '@redhen' => 'http://drupal.org/project/redhen',
           '@drupal' => 'http://drupal.org',
           '@wikipedia_ams' => 'http://en.wikipedia.org/wiki/Association_management_system',
+          '@doco' => 'https://www.drupal.org/node/1989564',
         )) . '</p>';
+      $output .= '<h3>' . t('Uses') . '</h3>';
+      $output .= '<dl>';
+      $output .= '<dt>' . t('General') . '</dt>';
+      $output .= '<dd>' . t('RedHen CRM was initially designed around the CRM needs of membership organizations and associations. The RedHen framework extends the core RedHen module for increased flexibilivsty that can be leveraged to develop a wide range of CRM solutions.') . '</dd>';
+      $output .= '<dt>' . t('Basic Concepts and Features') . '</dt>';
+      $output .= '<dd>' . t('RedHen installs as a single core RedHen module and a collection of sub-modules. Based on the features you will need, you can enable only the sub-modules required. For more information on available RedHen CRM features, see the Module Breakdown section of the online documentation for the <a href="@features">RedHen module</a>.',
+        array(
+          '@features' => 'https://www.drupal.org/node/1989564/#module_breakdown',
+        )) . '</dd>';
+      $output .= '<dt>' . t('Setup and Basic Tour') . '</dt>';
+      $output .= '<dd>' . t('The majority of RedHen CRM modules are installed as a single package and can be enabled independently. All the modules required for a complete CRM solution are not enabled by default. Once you have RedHen installed and enabled, there are four important places to find RedHen settings and data on your site. These are detailed in the Basic Tour section found at <a href="@setup">Setup & Basic Tour</a>.',
+        array(
+          '@setup' => 'https://www.drupal.org/node/1990380',
+        )) . '</dd>';
+      $output .= '</dl>';
+      return $output;
   }
 }
 
