@@ -1238,7 +1238,7 @@ function _redhen_contact_user_embed_contact_form(&$form, &$form_state, RedhenCon
   // Get contact type form.
   $form['redhen_contact'] = array(
     '#type' => 'fieldset',
-    '#title' => t('%type Contact information', array('%type' => ucfirst($contact->bundle()))),
+    '#title' => t('Contact information'),
     'form' => redhen_contact_contact_form(array(), $form_state, $contact),
   );
 
