@@ -191,6 +191,7 @@ function redhen_relation_uninstall() {
     ->distinct()
     ->execute();
 
+  $relationship_type = array();
   while ($record = $query->fetchAssoc()) {
     $relationship_type[] = $record['relation_type'];
   }
