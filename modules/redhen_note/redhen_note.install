@@ -81,7 +81,7 @@ function redhen_note_schema() {
 
 
 /**
- * Implements hook_install()
+ * Implements hook_install().
  */
 function redhen_note_install() {
   // Redhen Note Body field config.
@@ -150,9 +150,20 @@ function redhen_note_install() {
  */
 function redhen_note_uninstall() {
   // Delete note fields and taxonomy.
-  field_delete_instance('redhen_note_body', TRUE);
-  field_delete_instance('redhen_note_type', TRUE);
-  taxonomy_vocabulary_delete(taxonomy_vocabulary_machine_name_load('note_type')->vid);
+  $note_fields = array(
+    'redhen_note_body',
+    'redhen_note_type',
+  );
+  foreach ($note_fields as $field_name) {
+    $instance = field_info_instance('redhen_note', $field_name, 'redhen_note');
+    if ($instance) {
+      field_delete_instance($instance, TRUE);
+    }
+  }
+  $taxonomy = taxonomy_vocabulary_machine_name_load('note_type');
+  if ($taxonomy) {
+    taxonomy_vocabulary_delete($taxonomy->vid);
+  }
 }
 
 /**
