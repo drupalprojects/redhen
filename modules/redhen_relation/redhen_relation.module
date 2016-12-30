@@ -327,8 +327,8 @@ function redhen_relation_role_get_permissions($account) {
           }
         }
       }
-      $return[$account->uid] = $return_permissions;
     }
+    $return[$account->uid] = $return_permissions;
   }
 
   return $return[$account->uid];
