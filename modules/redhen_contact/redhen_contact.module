@@ -1251,6 +1251,10 @@ function _redhen_contact_user_embed_contact_form(&$form, &$form_state, RedhenCon
  */
 function redhen_contact_user_registration_validate($form, &$form_state) {
   $contact_type = $form_state['redhen_contact']->bundle();
+  if (empty($form_state['values']['mail'])) {
+    // User registration form is invalid anyway, let that validator handle it.
+    return;
+  }
   $existing_contact = redhen_contact_load_by_mail($form_state['values']['mail']);
   $contact = $existing_contact ? current($existing_contact) : array();
   $update_existing = variable_get(REDHEN_CONTACT_REG_UPDATE, FALSE);
