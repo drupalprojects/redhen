@@ -1,13 +1,17 @@
 <?php
 
 /**
+ * @file
+ * Module file for RedHen Registration.
+ */
+
+/**
  * Implements hook_menu().
- *
  */
 function redhen_registration_menu() {
   $items = array();
 
-  // contact registrations
+  // Contact registrations:
   $items['redhen/contact/%redhen_contact/registrations'] = array(
     'title' => 'Registrations',
     'page callback' => 'redhen_registration_page',
@@ -15,7 +19,7 @@ function redhen_registration_menu() {
     'access callback' => 'redhen_contact_access',
     'access arguments' => array('view', 2),
     'type' => MENU_LOCAL_TASK,
-    'weight' => 0
+    'weight' => 0,
   );
 
   return $items;
@@ -34,13 +38,13 @@ function redhen_registration_page(RedhenContact $contact) {
   $query->propertyCondition('registrant_id', $contact->identifier(), '=');
   $result = $query->execute();
 
-  // setup the header for both the query and table
+  // Setup the header for both the query and table:
   $header = array(
     'type' => array(
       'field' => 'type',
       'type' => 'property',
       'data' => 'Type',
-      'specifier' => 'type'
+      'specifier' => 'type',
     ),
     'entity' => array('data' => 'Parent Entity'),
     'author' => array('data' => 'Author'),
@@ -48,14 +52,14 @@ function redhen_registration_page(RedhenContact $contact) {
       'field' => 'count',
       'type' => 'property',
       'data' => 'Count',
-      'specifier' => 'count'
+      'specifier' => 'count',
     ),
     'updated' => array(
       'field' => 'updated',
       'type' => 'property',
       'data' => 'Updated',
       'sort' => 'desc',
-      'specifier' => 'updated'
+      'specifier' => 'updated',
     ),
     'Actions',
   );
@@ -69,7 +73,7 @@ function redhen_registration_page(RedhenContact $contact) {
     '#theme' => 'redhen_registration_list',
     '#registrations' => $registrations,
     '#header' => $header,
-    '#contact' => $contact
+    '#contact' => $contact,
   );
 }
 
@@ -82,9 +86,9 @@ function redhen_registration_theme() {
       'variables' => array(
         'registrations' => NULL,
         'header' => NULL,
-        'contact' => NULL
+        'contact' => NULL,
       ),
-    )
+    ),
   );
 }
 
@@ -120,15 +124,15 @@ function theme_redhen_registration_list($variables) {
           $author ? $author->name : '',
           $registration->count,
           redhen_format_date($registration->updated, 'short'),
-          implode(' | ', $actions)
-        )
+          implode(' | ', $actions),
+        ),
       );
     }
 
     $render['table'] = array(
       '#theme' => 'table',
       '#header' => $header,
-      '#rows' => $rows
+      '#rows' => $rows,
     );
     $render['pager'] = array(
       '#theme' => 'pager',
@@ -136,7 +140,7 @@ function theme_redhen_registration_list($variables) {
   }
   else {
     $wrapper = entity_metadata_wrapper('redhen_contact', $variables['contact']);
-    // no results, set a message
+    // No results, set a message:
     $render['no-result'] = array(
       '#type' => 'markup',
       '#markup' => t('There are no registrations for %name.',
