@@ -96,7 +96,7 @@ function redhen_contact_contact_form_validate($form, &$form_state) {
   field_attach_form_validate('redhen_contact', $contact, $form, $form_state);
 
   // If mirroring a connected and contact email's, ensure the email is not used
-  // by anther Drupal user.
+  // by another Drupal user.
   if (redhen_contact_user_email_setting(REDHEN_CONTACT_MIRROR_EMAIL, $contact) && $contact->uid) {
     foreach ($form_state['values'][REDHEN_CONTACT_EMAIL_FIELD][LANGUAGE_NONE] as $email) {
       if (is_array($email) && !empty($email['value']) && $email['default']) {
@@ -104,7 +104,7 @@ function redhen_contact_contact_form_validate($form, &$form_state) {
         if ($user && ($user->uid != $contact->uid)) {
           form_set_error(
             REDHEN_CONTACT_EMAIL_FIELD,
-            t('This contact\'s primary email is configured to mirror the associated Drupal user and email address %email is already in use by another Drupal user.',
+            t("This contact's primary email is configured to mirror the associated Drupal user and email address %email is already in use by another Drupal user.",
               array('%email' => $email['value'])
             )
           );
@@ -121,7 +121,7 @@ function redhen_contact_contact_form_validate($form, &$form_state) {
 function redhen_contact_contact_form_submit($form, &$form_state) {
   $contact = &$form_state['redhen_contact'];
 
-  // Set the contact's author uid
+  // Set the contact's author uid.
   global $user;
   $contact->author_uid = $user->uid;
 
@@ -330,10 +330,10 @@ function redhen_contact_contact_user_form($form, &$form_state, RedhenContact $co
         'message' => array(
           '#markup' => t('!user is currently linked with %contact.', array(
             '!user' => l($user->name, $user_uri['path']),
-            '%contact' => $contact->label()
+            '%contact' => $contact->label(),
           ))
         ),
-        'user' => user_view($user)
+        'user' => user_view($user),
       ),
       array(
         'user_actions' => array(
@@ -342,16 +342,16 @@ function redhen_contact_contact_user_form($form, &$form_state, RedhenContact $co
             'unlink' => array(
               '#type' => 'submit',
               '#value' => t('Unlink'),
-              '#submit' => array('redhen_contact_unlink_user_submit')
+              '#submit' => array('redhen_contact_unlink_user_submit'),
             ),
             'delete' => array(
               '#type' => 'submit',
               '#value' => t('Delete'),
-              '#submit' => array('redhen_contact_unlink_user_submit')
-            )
-          )
-        )
-      )
+              '#submit' => array('redhen_contact_unlink_user_submit'),
+            ),
+          ),
+        ),
+      ),
     );
   }
   else {
@@ -360,21 +360,21 @@ function redhen_contact_contact_user_form($form, &$form_state, RedhenContact $co
       '#type' => 'select',
       '#options' => array(
         'existing' => t('Choose existing'),
-        'new' => t('Create new')
+        'new' => t('Create new'),
       ),
       '#description' => t('Link a new or existing Drupal user to this contact'),
       '#ajax' => array(
         'callback' => 'redhen_contact_select_user_callback',
-        'wrapper' => 'redhen-contact-user-form'
+        'wrapper' => 'redhen-contact-user-form',
       ),
       '#weight' => -100,
-      '#required' => TRUE
+      '#required' => TRUE,
     );
 
     if (isset($form_state['values']['link_user']) && !empty($form_state['values']['link_user'])) {
       switch ($form_state['values']['link_user']) {
         case 'existing':
-          // get default value based on email
+          // Get default value based on email:
           $desc = t('Start typing to select a Drupal user to link to this contact.');
           foreach ($contact->allEmail() as $email) {
             if ($user = user_load_by_mail($email)) {
@@ -390,15 +390,15 @@ function redhen_contact_contact_user_form($form, &$form_state, RedhenContact $co
             '#description' => $desc,
             '#default_value' => $default,
             '#autocomplete_path' => 'user/autocomplete',
-            '#required' => TRUE
+            '#required' => TRUE,
           );
 
           break;
 
         case 'new';
-          // Use the core user registration form, with some adjustments
+          // Use the core user registration form, with some adjustments.
           $form = user_register_form($form, $form_state);
-          // default value for email field
+          // Default value for email field:
           $form['account']['mail']['#default_value'] = $contact->email();
           $form['account']['name']['#default_value'] = $contact->label();
           $form['#submit'][] = 'redhen_contact_contact_user_form_submit';
@@ -407,7 +407,7 @@ function redhen_contact_contact_user_form($form, &$form_state, RedhenContact $co
 
     $form['actions']['submit'] = array(
       '#type' => 'submit',
-      '#value' => t('Link user')
+      '#value' => t('Link user'),
     );
   }
 
@@ -423,15 +423,16 @@ function redhen_contact_contact_user_form($form, &$form_state, RedhenContact $co
  * @return array
  */
 function redhen_contact_select_user_callback($form, &$form_state) {
-  // hack to prevent validation on ajax postback, http://drupal.org/node/831900#comment-3124386
+  // Hack to prevent validation on ajax postback:
+  // http://drupal.org/node/831900#comment-3124386
   drupal_get_messages('error');
   form_set_error(NULL, '', TRUE);
 
-  // clear any potential error messages
+  // Clear any potential error messages.
   $commands[] = ajax_command_remove('#messages');
 
-  // return the entire form since we need a certain structure for the
-  // user account validation to work properly
+  // Return the entire form since we need a certain structure for the user
+  // account validation to work properly.
   $commands[] = ajax_command_replace('#redhen-contact-user-form', render($form));
 
   return array('#type' => 'ajax', '#commands' => $commands);
@@ -454,7 +455,7 @@ function redhen_contact_unlink_user_submit($form, &$form_state) {
   drupal_set_message(t('The Drupal user %name has been %action from this contact.',
     array(
       '%name' => $user->name,
-      '%action' => $delete ? t('deleted') : t('unlinked')
+      '%action' => $delete ? t('deleted') : t('unlinked'),
     )
   ));
 }
@@ -466,7 +467,7 @@ function redhen_contact_unlink_user_submit($form, &$form_state) {
  * @param $form_state
  */
 function redhen_contact_contact_user_form_validate($form, &$form_state) {
-  // ensure user is not already linked to a contact
+  // Ensure user is not already linked to a contact.
   if (isset($form_state['values']['link_user']) && $form_state['values']['link_user'] == 'existing' && isset($form_state['values']['existing'])) {
     $contact = $form_state['redhen_contact'];
 
@@ -512,6 +513,7 @@ function redhen_contact_contact_user_form_submit($form, &$form_state) {
       $user = user_load_by_name($form_state['values']['existing']);
       $contact->uid = $user->uid;
       break;
+
     case 'new':
       $user = $form_state['user'];
       $contact->uid = $user->uid;
@@ -523,7 +525,7 @@ function redhen_contact_contact_user_form_submit($form, &$form_state) {
       drupal_set_message(t('Drupal user %name has been linked to contact %contact.',
         array(
           '%name' => $user->name,
-          '%contact' => $contact->label()
+          '%contact' => $contact->label(),
         )
       ));
       $uri = entity_uri('redhen_contact', $contact);
@@ -533,7 +535,7 @@ function redhen_contact_contact_user_form_submit($form, &$form_state) {
       drupal_set_message(t('Unable to link Drupal user %name to contact %contact.',
         array(
           '%name' => $user->name,
-          '%contact' => $contact->label()
+          '%contact' => $contact->label(),
         )
       ), 'warning');
     }
