@@ -24,21 +24,12 @@ function redhen_engagement_rules_action_info() {
     'group' => t('Engagement'),
     'access callback' => 'redhen_engagement_access',
   );
-  // Declare parameters used by both email and user ID actions.
-  $parameters = array(
-    'entity' => array(
-      'type' => 'entity',
-      'label' => t('Entity'),
-      'description' => t('Specifies the entity that a score should be registered for.'),
-    ),
-  );
 
   // Add an action to score an engagement by email address.
   $actions['score_engagement_by_mail'] = $defaults + array(
-    'label' => t('Score engagement by email'),
-    'base' => 'redhen_engagement_rules_action_score_by_mail',
-  );
-  $actions['score_engagement_by_mail']['parameter'] += $parameters;
+      'label' => t('Score engagement by email'),
+      'base' => 'redhen_engagement_rules_action_score_by_mail',
+    );
   $actions['score_engagement_by_mail']['parameter']['mail'] = array(
     'type' => 'text',
     'label' => t('Email address'),
@@ -47,10 +38,9 @@ function redhen_engagement_rules_action_info() {
 
   // Add an action to score an engagement by user ID.
   $actions['score_engagement_by_uid'] = $defaults + array(
-    'label' => t('Score engagement by user ID'),
-    'base' => 'redhen_engagement_rules_action_score_by_uid',
-  );
-  $actions['score_engagement_by_uid']['parameter'] += $parameters;
+      'label' => t('Score engagement by user ID'),
+      'base' => 'redhen_engagement_rules_action_score_by_uid',
+    );
   $actions['score_engagement_by_uid']['parameter']['uid'] = array(
     'type' => 'integer',
     'label' => t('User ID'),
@@ -60,9 +50,9 @@ function redhen_engagement_rules_action_info() {
   // webform
   if (module_exists('webform_rules')) {
     $actions['score_webform_engagement'] = $defaults + array(
-       'label' => t('Score webform engagement'),
-       'base' => 'redhen_engagement_rules_action_score_webform',
-    );
+        'label' => t('Score webform engagement'),
+        'base' => 'redhen_engagement_rules_action_score_webform',
+      );
     $actions['score_webform_engagement']['parameter']['webform'] = array(
       'type' => 'webform',
       'label' => t('Webform'),
@@ -76,19 +66,21 @@ function redhen_engagement_rules_action_info() {
 /**
  * Rules action: score an engagement by user ID.
  */
-function redhen_engagement_rules_action_score_by_uid($scores, $entity, $uid) {
-  if ($contact = redhen_contact_load_by_user(user_load($uid))) {
-    redhen_engagement_rules_action_score_contact($scores, $contact, t('Scored @label', array('@label' => $entity->label())), $entity->type(), $entity->getIdentifier());
+function redhen_engagement_rules_action_score_by_uid($scores, $uid) {
+  if ($user = user_load($uid)) {
+    if ($contact = redhen_contact_load_by_user($user)) {
+      redhen_engagement_rules_action_score_contact($scores, $contact, t('Scored @label', array('@label' => $user->label())), $user->type(), $user->getIdentifier());
+    }
   }
 }
 
 /**
  * Rules action: score an engagement by email address.
  */
-function redhen_engagement_rules_action_score_by_mail($scores, $entity, $mail) {
+function redhen_engagement_rules_action_score_by_mail($scores, $mail) {
   if ($contacts = redhen_contact_load_by_mail($mail)) {
     foreach ($contacts as $contact) {
-      redhen_engagement_rules_action_score_contact($scores, $contact, t('Scored @label', array('@label' => $entity->label())), $entity->type(), $entity->getIdentifier());
+      redhen_engagement_rules_action_score_contact($scores, $contact, t('Scored @label', array('@label' => $contact->label())), $contact->type(), $contact->getIdentifier());
     }
   }
 }
